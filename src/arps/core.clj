@@ -13,13 +13,15 @@
 (def long-kick (sample (freesound-path 40616)))
 (def phat-kick (sample (freesound-path 189174)))
 (def open-hat (sample (freesound-path 26657)))
+(def closed-hat (sample (freesound-path 101442)))
 
 ; Play with the sounds
 
-;(phat-kick) ; phat ass kick
-;(long-kick 5) ; long kick 5 times speed
-;(open-hat)
-
+(phat-kick) ; phat ass kick
+(long-kick 1) ; long kick 5 times speed
+(open-hat 0.5)
+(shitty-snare 0.4)
+(closed-hat)
 
 (defsynth sin-square2 [freq 440 level 0.5]
   (out 0 (* [0.5 0.5] (+ (square (* level freq)) (sin-osc freq)))))
@@ -49,6 +51,25 @@
     (out 0 [wet dry])))
 
 (reverb-on-left shitty-snare :mix 0.6)
+
+(def metro (metronome 128))
+
+
+;; After starting the player below change instruments etc on the fly
+(defn player [beat]
+  (at (metro beat) (phat-kick) (closed-hat 13))
+  (at (metro (+ 0.5 beat)) (closed-hat 1) (open-hat))
+  (at (metro (+ 0.25 beat)) (closed-hat 1.5))
+  (at (metro (+ 0.5 beat)) (closed-hat 1.7))
+  (at (metro (+ 0.75 beat)) (closed-hat 19))
+  (at (metro (+ 0.99 beat)) (phat-kick 0.25) (open-hat 2))
+  (apply-at (metro (inc beat)) #'player (inc beat) []))
+
+(player (metro))
+
+(stop)
+
+
 
 
 

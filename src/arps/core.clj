@@ -9,19 +9,29 @@
 
 ; Load some samples (free sound!!!!!!!!!)
 
-(def shitty-snare (sample (freesound-path 26903)))
-(def long-kick (sample (freesound-path 40616)))
-(def phat-kick (sample (freesound-path 189174)))
-(def open-hat (sample (freesound-path 26657)))
-(def closed-hat (sample (freesound-path 101442)))
+(defn freesound [path] (sample (freesound-path path)))
+
+
+(def shitty-snare (freesound 26903))
+(def long-kick (freesound 40616))
+(def phat-kick (freesound 189174))
+(def open-hat (freesound 26657))
+(def closed-hat (freesound 101442))
+(def alienwhisper (freesound 9665))
+(def grenade (freesound 33245))
+(def that-was-close (freesound 203336))
+(def giggle (freesound 204496))
 
 ; Play with the sounds
-
 (phat-kick) ; phat ass kick
-(long-kick 1) ; long kick 5 times speed
-(open-hat 0.5)
-(shitty-snare 0.4)
-(closed-hat)
+(long-kick 3) ; long kick 5 times speed
+(open-hat 0.125)
+(shitty-snare 0.012)
+(closed-hat 0.01)
+(alienwhisper 0.5)
+(grenade 0.25)
+(that-was-close)
+(giggle 0.8)
 
 (defsynth sin-square2 [freq 440 level 0.5]
   (out 0 (* [0.5 0.5] (+ (square (* level freq)) (sin-osc freq)))))
@@ -40,7 +50,7 @@
 
 
 ; Some other shit
-(demo (* 0.5 (lpf (sin-osc [220 221]) 280)))
+; (demo (* 0.5 (lpf (sin-osc [220 221]) 280)))
 
 
 ;; synths over a sample buffer
@@ -50,6 +60,7 @@
     wet (free-verb :in dry :mix mix :damp damp :room room)]
     (out 0 [wet dry])))
 
+(reverb-on-left giggle)
 (reverb-on-left shitty-snare :mix 0.6)
 
 (def metro (metronome 128))
@@ -57,22 +68,15 @@
 
 ;; After starting the player below change instruments etc on the fly
 (defn player [beat]
-  (at (metro beat) (phat-kick) (closed-hat 13))
-  (at (metro (+ 0.5 beat)) (closed-hat 1) (open-hat))
-  (at (metro (+ 0.25 beat)) (closed-hat 1.5))
+  (at (metro beat) (long-kick 25) (closed-hat 13))
+  (at (metro (+ 0.5 beat)) (closed-hat 1.4) (open-hat 10))
+  (at (metro (+ 0.25 beat)) (open-hat 2.5))
   (at (metro (+ 0.5 beat)) (closed-hat 1.7))
-  (at (metro (+ 0.75 beat)) (closed-hat 19))
+  (at (metro (+ 0.75 beat)) (closed-hat 1.4))
   (apply-at (metro (inc beat)) #'player (inc beat) []))
 
+; Start the player with the metronome
 (player (metro))
-
 (stop)
-
-
-(metro-bpm metro (* 128))
-
-
-
-
-
-
+; change up the tempo
+;(metro-bpm metro (* 128 2))

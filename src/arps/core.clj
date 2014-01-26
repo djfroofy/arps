@@ -62,7 +62,6 @@
   (at (metro (+ 0.25 beat)) (closed-hat 1.5))
   (at (metro (+ 0.5 beat)) (closed-hat 1.7))
   (at (metro (+ 0.75 beat)) (closed-hat 19))
-  (at (metro (+ 0.99 beat)) (phat-kick 0.25) (open-hat 2))
   (apply-at (metro (inc beat)) #'player (inc beat) []))
 
 (player (metro))
@@ -70,7 +69,7 @@
 (stop)
 
 
-
+(metro-bpm metro (* 128))
 
 
 

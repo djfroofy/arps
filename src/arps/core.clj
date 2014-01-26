@@ -3,75 +3,54 @@
   (:require [clojure.string :as str]))
 
 
-(demo (sin-osc))
 
-(sin-osc 440)
+; Stop everything
+(stop)
+
+; Load some samples (free sound!!!!!!!!!)
 
 (def shitty-snare (sample (freesound-path 26903)))
-(shitty-snare)
-
 (def long-kick (sample (freesound-path 40616)))
 (def phat-kick (sample (freesound-path 189174)))
 (def open-hat (sample (freesound-path 26657)))
 
-(phat-kick 1.25 :loop 5)
-(long-kick)
+; Play with the sounds
+
+;(phat-kick) ; phat ass kick
+;(long-kick 5) ; long kick 5 times speed
+;(open-hat)
+
 
 (defsynth sin-square2 [freq 440 level 0.5]
   (out 0 (* [0.5 0.5] (+ (square (* level freq)) (sin-osc freq)))))
 
-(defsynth simple-saw [freq 220 level 0.5]
-  (let [v (* level (saw freq))]
-    (out 0 v)
-    (out 1 v)))
-
-(stop)
-(simple-saw)
-(simple-saw 222)
-
-(kill 1142 1143)
-
-(sin-square2 :level 0.1 :freq (* 329.1  0.5 1.7))
+(defsynth simple-saw [freq 220 level 0.5 distance 2]
+  (let []
+    (out 0 (* level (saw freq)))
+    (out 1 (* level (saw (+ freq distance))))))
 
 
-(stop)
+; Play with the synths
+;(simple-saw (* 110) :distance 5)
+; (simple-saw 55)
+;(sin-square2 :level 0.1 :freq (* 329.1  0.5 1.7))
+;(sin-square2 :level 0.5 :freq 110)
 
 
+; Some other shit
 (demo (* 0.5 (lpf (sin-osc [220 221]) 280)))
 
-(defsynth reverb-on-left [sample-buff 2]
+
+;; synths over a sample buffer
+
+(defsynth reverb-on-left [sample-buff 1 mix 0.81 damp 0.1 room 1]
   (let [dry (play-buf 1 sample-buff)
-    wet (free-verb :in dry :mix 0.81 :damp 0.1 :room 1)]
+    wet (free-verb :in dry :mix mix :damp damp :room room)]
     (out 0 [wet dry])))
-(reverb-on-left shitty-snare)
+
+(reverb-on-left shitty-snare :mix 0.6)
 
 
-(definst c-hat [amp 0.8 t 0.04]
-  (let [env (env-gen (perc 0.001 t) 1 1 0 1 FREE)
-        noise (white-noise)
-        sqr (* (env-gen (perc 0.01 0.04)) (pulse 880 0.2))
-        filt (bpf (+ sqr noise) 9000 0.5)]
-    (* amp env filt)))
-
-
-(definst o-hat [amp 0.9 t 0.5]
-  (let [env (env-gen (perc 0.001 t) 1 1 0 1 FREE)
-        noise (white-noise)
-        sqr (* (env-gen (perc 0.01 0.04)) (pulse 880 0.2))
-        filt (bpf (+ sqr noise) 9000 0.5)]
-    (* amp env filt)))
-
-(defn swinger [beat]
-  (at (metro beat) (o-hat))
-  (at (metro (inc beat)) (c-hat))
-  (at (metro (+ 1.65 beat)) (c-hat))
-  (apply-at (metro (+ 2 beat)) #'swinger (+ 2 beat) []))
-
-; define a metronome at a given tempo, expressed in beats per minute.
-(def metro (metronome 120))
-
-(swinger (metro))
-(stop)
 
 
 
